@@ -1,0 +1,33 @@
+HKCR
+{
+	C935_Gen34.MA_MSHFlexGridEx.1 = s 'MAMSHFlexGridEx class'
+	{
+		CLSID = s '{3bed3d81-37a8-429b-917a-7f40c245d228}'
+		Insertable
+	}
+	C935_Gen34.MA_MSHFlexGridEx = s 'MAMSHFlexGridEx class'
+	{		
+		CurVer = s 'C935_Gen34.MA_MSHFlexGridEx.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {3bed3d81-37a8-429b-917a-7f40c245d228} = s 'MAMSHFlexGridEx class'
+		{
+			ProgID = s 'C935_Gen34.MA_MSHFlexGridEx.1'
+			VersionIndependentProgID = s 'C935_Gen34.MA_MSHFlexGridEx'
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			ForceRemove Control
+			ForceRemove 'ToolboxBitmap32' = s '%MODULE%, 108'
+			MiscStatus = s '0'
+			{
+			    '1' = s '%OLEMISC%'
+			}
+			TypeLib = s '{7d464986-8807-4a52-859c-5d7c4a9f3242}'
+			Version = s '1.0'
+		}
+	}
+}

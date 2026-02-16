@@ -1,0 +1,266 @@
+// MA_AUTODOC: ============================================================================
+// MA_AUTODOC: MAControls.idl
+// MA_AUTODOC: IDL/TypeLib проекта: описывает COM-интерфейсы IMAComboBoxEx и IMAMSHFlexGridEx,
+// MA_AUTODOC: а также перечисления типов редакторов ячеек (MACellEditorType) и маску exit-клавиш (MANavExitKeys).
+// MA_AUTODOC: Из этого файла MIDL генерирует .tlb и прокси/стаб код (при соответствующей конфигурации).
+// MA_AUTODOC: ============================================================================
+
+// MAControls.idl : IDL source for MAControls
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (MAControls.tlb) and marshalling code.
+
+#include "olectl.h"
+import "oaidl.idl";
+import "ocidl.idl";
+
+// MA_AUTODOC: Тип редактора ячейки для MAMSHFlexGridEx.
+// MA_AUTODOC: Эти значения управляют тем, какой внешний редактор будет показан при BeginEdit.
+typedef [v1_enum] enum MACellEditorType
+{
+    maCellText = 0, // free text, no drop button
+    maCellCombo = 1, // list + free text
+    maCellList = 2, // list only
+    maCellReadOnly = 3  // no editing
+} MACellEditorType;
+
+// MA_AUTODOC: Маска клавиш, которые считаются 'выходными' из режима редактирования.
+// MA_AUTODOC: Используется Level-B навигацией: после commit можно сместить выделение (Tab/стрелки и т.п.).
+typedef [v1_enum] enum MANavExitKeys
+{
+    maNavExitNone = 0,
+    maNavExitEnter = 1,   // optional (Enter already commits by default)
+    maNavExitTab = 2,
+    maNavExitShiftTab = 4,
+    maNavExitLeft = 8,
+    maNavExitRight = 16,
+    maNavExitUp = 32,
+    maNavExitDown = 64
+} MANavExitKeys;
+
+[
+    object,
+    uuid(4faef8a5-5585-463b-9ac6-47fe50774672),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+// MA_AUTODOC: IMAComboBoxEx — COM интерфейс обёртки над MSForms.ComboBox.
+// MA_AUTODOC: Содержит стандартные свойства ActiveX + вспомогательные поля Row/Col и доступ к внутреннему Combo.
+interface IMAComboBoxEx : IDispatch
+{
+    [propput, bindable, requestedit, id(DISPID_BACKCOLOR)]
+    HRESULT BackColor([in]OLE_COLOR clr);
+    [propget, bindable, requestedit, id(DISPID_BACKCOLOR)]
+        HRESULT BackColor([out, retval]OLE_COLOR* pclr);
+    [propput, bindable, requestedit, id(DISPID_BORDERSTYLE)]
+        HRESULT BorderStyle([in]long style);
+    [propget, bindable, requestedit, id(DISPID_BORDERSTYLE)]
+        HRESULT BorderStyle([out, retval]long* pstyle);
+    [propputref, bindable, requestedit, id(DISPID_FONT)]
+        HRESULT Font([in]IFontDisp* pFont);
+    [propput, bindable, requestedit, id(DISPID_FONT)]
+        HRESULT Font([in]IFontDisp* pFont);
+    [propget, bindable, requestedit, id(DISPID_FONT)]
+        HRESULT Font([out, retval]IFontDisp** ppFont);
+    [propput, bindable, requestedit, id(DISPID_FORECOLOR)]
+        HRESULT ForeColor([in]OLE_COLOR clr);
+    [propget, bindable, requestedit, id(DISPID_FORECOLOR)]
+        HRESULT ForeColor([out, retval]OLE_COLOR* pclr);
+    [propput, bindable, requestedit, id(DISPID_ENABLED)]
+        HRESULT Enabled([in]VARIANT_BOOL vbool);
+    [propget, bindable, requestedit, id(DISPID_ENABLED)]
+        HRESULT Enabled([out, retval]VARIANT_BOOL* pbool);
+    [propput, bindable, requestedit, id(DISPID_TABSTOP)]
+        HRESULT TabStop([in]VARIANT_BOOL vbool);
+    [propget, bindable, requestedit, id(DISPID_TABSTOP)]
+        HRESULT TabStop([out, retval]VARIANT_BOOL* pbool);
+    [propput, bindable, requestedit, id(DISPID_TEXT)]
+        HRESULT Text([in]BSTR strText);
+    [propget, bindable, requestedit, id(DISPID_TEXT)]
+        HRESULT Text([out, retval]BSTR* pstrText);
+
+    // VB-like helpers (used by MAMSHFlexGridEx overlay editor)
+    [propput, id(101)] HRESULT Row([in]LONG row);
+    [propget, id(101)] HRESULT Row([out, retval]LONG* pRow);
+    [propput, id(102)] HRESULT Col([in]LONG col);
+    [propget, id(102)] HRESULT Col([out, retval]LONG* pCol);
+
+    // Inner MSForms.ComboBox (IDispatch)
+    [propget, id(103)] HRESULT Combo([out, retval]IDispatch** ppCombo);
+};
+
+[
+    object,
+    uuid(e342b423-a2f6-4952-a7ee-eee980eecfa3),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+// MA_AUTODOC: IMAMSHFlexGridEx — COM интерфейс основного контрола-обёртки над MSHFlexGrid.
+// MA_AUTODOC: Помимо стандартных свойств ActiveX, предоставляет настройку типов ячеек, items и навигации.
+interface IMAMSHFlexGridEx : IDispatch
+{
+    [propput, bindable, requestedit, id(DISPID_BACKCOLOR)]
+    HRESULT BackColor([in]OLE_COLOR clr);
+    [propget, bindable, requestedit, id(DISPID_BACKCOLOR)]
+        HRESULT BackColor([out, retval]OLE_COLOR* pclr);
+    [propput, bindable, requestedit, id(DISPID_BORDERSTYLE)]
+        HRESULT BorderStyle([in]long style);
+    [propget, bindable, requestedit, id(DISPID_BORDERSTYLE)]
+        HRESULT BorderStyle([out, retval]long* pstyle);
+    [propputref, bindable, requestedit, id(DISPID_FONT)]
+        HRESULT Font([in]IFontDisp* pFont);
+    [propput, bindable, requestedit, id(DISPID_FONT)]
+        HRESULT Font([in]IFontDisp* pFont);
+    [propget, bindable, requestedit, id(DISPID_FONT)]
+        HRESULT Font([out, retval]IFontDisp** ppFont);
+    [propput, bindable, requestedit, id(DISPID_FORECOLOR)]
+        HRESULT ForeColor([in]OLE_COLOR clr);
+    [propget, bindable, requestedit, id(DISPID_FORECOLOR)]
+        HRESULT ForeColor([out, retval]OLE_COLOR* pclr);
+    [propput, bindable, requestedit, id(DISPID_ENABLED)]
+        HRESULT Enabled([in]VARIANT_BOOL vbool);
+    [propget, bindable, requestedit, id(DISPID_ENABLED)]
+        HRESULT Enabled([out, retval]VARIANT_BOOL* pbool);
+    [propput, bindable, requestedit, id(DISPID_TABSTOP)]
+        HRESULT TabStop([in]VARIANT_BOOL vbool);
+    [propget, bindable, requestedit, id(DISPID_TABSTOP)]
+        HRESULT TabStop([out, retval]VARIANT_BOOL* pbool);
+    [propput, bindable, requestedit, id(DISPID_TEXT)]
+        HRESULT Text([in]BSTR strText);
+    [propget, bindable, requestedit, id(DISPID_TEXT)]
+        HRESULT Text([out, retval]BSTR* pstrText);
+
+    // Direct access to the underlying MSHFlexGrid (IDispatch)
+    [propget, id(201)] HRESULT Grid([out, retval]IDispatch** ppGrid);
+
+    // Per-cell configuration
+    [id(202)] HRESULT SetCellType([in]LONG row, [in]LONG col, [in]MACellEditorType cellType);
+    [id(203)] HRESULT GetCellType([in]LONG row, [in]LONG col, [out, retval]MACellEditorType* pCellType);
+
+    // items: SAFEARRAY(BSTR) or SAFEARRAY(VARIANT) or a single BSTR
+    [id(204)] HRESULT SetCellItems([in]LONG row, [in]LONG col, [in]VARIANT items);
+    [id(205)] HRESULT ClearCellItems([in]LONG row, [in]LONG col);
+    [id(206)] HRESULT ClearCellConfig([in]LONG row, [in]LONG col);
+
+    // Per-column defaults
+    [id(207)] HRESULT SetColumnType([in]LONG col, [in]MACellEditorType cellType);
+    [id(208)] HRESULT SetColumnItems([in]LONG col, [in]VARIANT items);
+    [id(209)] HRESULT ClearColumnConfig([in]LONG col);
+
+    // Global defaults
+    [id(210)] HRESULT SetDefaultCellType([in]MACellEditorType cellType);
+    [id(211)] HRESULT SetDefaultCellItems([in]VARIANT items);
+    [id(212)] HRESULT ClearDefaultCellItems();
+
+    // --- Level-B navigation configuration ---
+    // exitKeysMask: bitmask MANavExitKeys (e.g. maNavExitTab | maNavExitLeft | ...)
+    // tabWrap: Excel-like wrap for Tab/ShiftTab (end-of-row -> next/prev row)
+    // skipReadOnly: while moving, skip fixed rows/cols and cells configured as maCellReadOnly
+    // beginEditAfterMove: after move, immediately enter edit mode (Enter-like)
+    [id(213)] HRESULT SetDefaultNavOptions(
+        [in]LONG exitKeysMask,
+        [in]VARIANT_BOOL tabWrap,
+        [in]VARIANT_BOOL skipReadOnly,
+        [in]VARIANT_BOOL beginEditAfterMove);
+
+    [id(214)] HRESULT SetColumnNavOptions(
+        [in]LONG col,
+        [in]LONG exitKeysMask,
+        [in]VARIANT_BOOL tabWrap,
+        [in]VARIANT_BOOL skipReadOnly,
+        [in]VARIANT_BOOL beginEditAfterMove);
+
+    [id(215)] HRESULT SetRowNavOptions(
+        [in]LONG row,
+        [in]LONG exitKeysMask,
+        [in]VARIANT_BOOL tabWrap,
+        [in]VARIANT_BOOL skipReadOnly,
+        [in]VARIANT_BOOL beginEditAfterMove);
+
+    [id(216)] HRESULT SetCellNavOptions(
+        [in]LONG row,
+        [in]LONG col,
+        [in]LONG exitKeysMask,
+        [in]VARIANT_BOOL tabWrap,
+        [in]VARIANT_BOOL skipReadOnly,
+        [in]VARIANT_BOOL beginEditAfterMove);
+
+    [id(217)] HRESULT ClearColumnNavOptions([in]LONG col);
+    [id(218)] HRESULT ClearRowNavOptions([in]LONG row);
+    [id(219)] HRESULT ClearCellNavOptions([in]LONG row, [in]LONG col);
+
+    // Allow mouse resizing of columns/rows in the underlying MSHFlexGrid.
+    // 0=flexResizeNone, 1=flexResizeColumns, 2=flexResizeRows, 3=flexResizeBoth
+    [propput, id(220)] HRESULT AllowUserResizing([in]LONG mode);
+    [propget, id(220)] HRESULT AllowUserResizing([out, retval]LONG* pMode);
+
+
+
+
+// ---- Headers helpers (row/column titles) ----
+// These write into TextMatrix on the fixed row/col:
+//  - Column headers use row 0 (FixedRows will be forced to >=1)
+//  - Row headers use col 0 (FixedCols will be forced to >=1)
+[id(221)] HRESULT SetColumnHeaderText([in]LONG col, [in]BSTR text);
+[id(222)] HRESULT SetRowHeaderText([in]LONG row, [in]BSTR text);
+[id(223)] HRESULT SetCornerHeaderText([in]BSTR text);
+
+// ---- Popup text editor settings (for maCellText editing) ----
+// TextEditWidthPx: 0 = use current cell width.
+// TextEditVisibleLines: for multiline editor, how many lines are visible at once (>=1).
+// TextEditMultiline: True => multiline Win32 EDIT (Enter inserts newline, Ctrl+Enter commits).
+[propput, id(224)] HRESULT TextEditWidthPx([in]LONG px);
+[propget, id(224)] HRESULT TextEditWidthPx([out, retval]LONG* ppx);
+
+[propput, id(225)] HRESULT TextEditVisibleLines([in]LONG lines);
+[propget, id(225)] HRESULT TextEditVisibleLines([out, retval]LONG* plines);
+
+[propput, id(226)] HRESULT TextEditMultiline([in]VARIANT_BOOL vbool);
+[propget, id(226)] HRESULT TextEditMultiline([out, retval]VARIANT_BOOL* pvbool);
+};
+
+[
+    uuid(7d464986-8807-4a52-859c-5d7c4a9f3242),
+    version(1.0),
+]
+library MAControlsLib
+{
+    importlib("stdole2.tlb");
+    [
+        uuid(6a2f3754-0418-468f-9dfe-a6034347ca14)
+    ]
+        dispinterface _IMAComboBoxExEvents
+    {
+        properties:
+        methods:
+    };
+    [
+        uuid(d3c4b88d-b1aa-4138-9616-a14dbf87d413),
+        control
+    ]
+        coclass MAComboBoxEx
+    {
+        [default] interface IMAComboBoxEx;
+        [default, source] dispinterface _IMAComboBoxExEvents;
+    };
+    [
+        uuid(bb57efd5-52f5-4b38-ba7e-7d034f5ef8b3)
+    ]
+        dispinterface _IMAMSHFlexGridExEvents
+    {
+        properties:
+        methods:
+    };
+    [
+        uuid(3bed3d81-37a8-429b-917a-7f40c245d228),
+        control
+    ]
+        coclass MAMSHFlexGridEx
+    {
+        [default] interface IMAMSHFlexGridEx;
+        [default, source] dispinterface _IMAMSHFlexGridExEvents;
+    };
+};
